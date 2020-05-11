@@ -2,7 +2,7 @@
 
 ## Overview
 
-The scripts contained in this repository have been written to address needs that I (or my team) have needed around the Tanzu Kubernetes Grid (TKG). 
+The scripts contained in this repository have been written to address needs that I (or my team) have needed around the Tanzu Kubernetes Grid (TKG).
 
 ## createClusters.sh
 
@@ -14,7 +14,7 @@ The first script in this repository: createClusters.sh addresses the above need.
 
 I've tried to make the script as reusable as possible.
 
-**Prerequisites**
+### Prerequisites
 
 - tkg binary should already be installed
 - tkg admin cluster should already be initialized
@@ -29,17 +29,23 @@ createCluster.sh 25
 ```
 
 Without modification, the above command should result in:
+
 - 25 clusters named: tkg-01 - tkg-25
+
 ![tkg-clusters](/assets/tkg-clusters.png)
+
 - Kubeconfig merged into Local ~/.kube/config for each cluster
-- ![tkg-clusters](/assets/tkg-kubeconfig-merged.png)
+
+![tkg-clusters](/assets/tkg-kubeconfig-merged.png)
+
 - 25 metal-lb-##.yaml files containing configuration for a range of 4 ip addresses
 - 25 tkg-##.kubeconfig files (one for each cluster created)
 - The .yaml and .kubeconfig files copied to corresponding remote system with suffix ## - matching the cluster number
 - A cleanup script that:
-- - Deletes each tkg cluster
-- - Deletes the .kubeconfig and .yaml 
-- - Removes the Cluster, Context, and User from the local .kube/config file (these were merged into the local config as the credentials were exported during the script)
+  - Deletes each tkg cluster
+  - Deletes the .kubeconfig and .yaml
+  - Removes the Cluster, Context, and User from the local .kube/config file (these were merged into the local config as the credentials were exported during the script)
+
 ```bash
 # Cleanup Script
 tkg delete cluster tkg-01 -y
