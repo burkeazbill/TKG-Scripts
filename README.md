@@ -30,13 +30,15 @@ createCluster.sh 25
 
 Without modification, the above command should result in:
 
-- 25 clusters named: tkg-01 - tkg-25
+- 25 single master/5 worker clusters named: tkg-01 - tkg-25
 
 ![tkg-clusters](/assets/tkg-clusters.png)
 
+![tkg-clusters-in-vmc-on-aws](/assets/tkg-clusters-in-vmc-on-aws.png)
+
 - Kubeconfig merged into Local ~/.kube/config for each cluster
 
-![tkg-clusters](/assets/tkg-kubeconfig-merged.png)
+![tkg-kubeconfig-merged](/assets/tkg-kubeconfig-merged.png)
 
 - 25 metal-lb-##.yaml files containing configuration for a range of 4 ip addresses
 - 25 tkg-##.kubeconfig files (one for each cluster created)
