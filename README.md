@@ -10,6 +10,8 @@ As an enablement team, the VMware Cloud Services [Livefire](https://www.livefire
 
 Our attendees will each be given a Linux Ubuntu based Horizon Desktop with some name, for example: ATT-CS-L-01. At the time of TKG Cluster creation, the kubeconfig for the cluster number matching the attendee desktop number should be copied to the desktop via SCP. Additionally, a small range of IP addresses should be populated in a Kubernetes config map yaml file and placed on the attendee desktop as well for use in one of the labs.
 
+![Horizon-TKG-Diagram](assets/Horizon-TKG-Diagram.png)
+
 The first script in this repository: createClusters.sh addresses the above need.
 
 I've tried to make the script as reusable as possible.
