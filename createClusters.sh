@@ -133,7 +133,7 @@ EOF
     echo rm metal-lb-$cluster_number.yaml >> $cleanup_script
     # Output kubeconfig files for attendees
     tkg get credentials $clustername --export-file $clustername.kubeconfig
-    if [ "$SCPTOREMOTE" == "1" ]; then
+    if [ "$scp_to_remote" == "1" ]; then
       remote_system=$remote_prefix$cluster_number
       # Now SCP the config file to the attendee desktop:
       echo Copying /$clustername.kubeconfig to $remote_system
