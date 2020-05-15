@@ -35,7 +35,7 @@ lb_address_count=4
 scp_to_remote=1
 # remote_prefix : Prefix for the remote systems. Suffix will match
 #               the suffix of the TKG Cluster (01 -> 99)
-remote_prefix="att-cs-li-"
+remote_prefix="att-cs-l-"
 # remote_ssh_username : The name of the user to be used for the scp connection
 remote_ssh_username="vmware"
 # remote_folder : The destination folder on the remote system for 
@@ -57,21 +57,21 @@ remote_folder="/home/$remote_ssh_username"
 # The following Environment variables are set at the time of TKG 
 # Admin cluster initialization. If you wish to override, edit and 
 # Uncomment as desired:
-# VSPHERE_RESOURCE_POOL: /SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/tkg
-# VSPHERE_TEMPLATE: /SDDC-Datacenter/vm/Workloads/tkg/photon-3-kube-v1.17.3+vmware.2
-# VSPHERE_SSH_AUTHORIZED_KEY: `cat $ssh_pub_key_path`
-# VSPHERE_DATASTORE: /SDDC-Datacenter/datastore/WorkloadDatastore
-# VSPHERE_DISK_GIB: "40"
-# VSPHERE_MEM_MIB: "4096"
-# CLUSTER_CIDR: 100.96.0.0/11
-# VSPHERE_NETWORK: vra-attendee-net
-# VSPHERE_DATACENTER: /SDDC-Datacenter
-# VSPHERE_HAPROXY_TEMPLATE: /SDDC-Datacenter/vm/Workloads/tkg/capv-haproxy-v0.6.3
-# VSPHERE_PASSWORD: 'put-your-own-vcenter-pw-here'
-# VSPHERE_USERNAME: 'yourvcenteruser@vsphere.local'
-# VSPHERE_FOLDER: /SDDC-Datacenter/vm/Workloads/tkg
-# VSPHERE_NUM_CPUS: "2"
-# VSPHERE_SERVER: place-vcenter-fqdn-here
+# VSPHERE_RESOURCE_POOL=/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/tkg
+# VSPHERE_TEMPLATE=/SDDC-Datacenter/vm/Workloads/tkg/photon-3-kube-v1.17.3+vmware.2
+# VSPHERE_SSH_AUTHORIZED_KEY=`cat $ssh_pub_key_path`
+# VSPHERE_DATASTORE=/SDDC-Datacenter/datastore/WorkloadDatastore
+# VSPHERE_DISK_GIB="40"
+# VSPHERE_MEM_MIB="4096"
+# CLUSTER_CIDR=100.96.0.0/11
+# VSPHERE_NETWORK=vra-attendee-net
+# VSPHERE_DATACENTER=/SDDC-Datacenter
+# VSPHERE_HAPROXY_TEMPLATE=/SDDC-Datacenter/vm/Workloads/tkg/capv-haproxy-v0.6.3
+# VSPHERE_PASSWORD='put-your-own-vcenter-pw-here'
+# VSPHERE_USERNAME='yourvcenteruser@vsphere.local'
+# VSPHERE_FOLDER=/SDDC-Datacenter/vm/Workloads/tkg
+# VSPHERE_NUM_CPUS="2"
+# VSPHERE_SERVER=place-vcenter-fqdn-here
 
 ###### You should not need to modify below this line ######
 (( lb_diff = lb_address_count -1 ))
