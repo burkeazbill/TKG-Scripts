@@ -4,7 +4,7 @@
 
 The scripts contained in this repository have been written to address needs that I (or my team) have needed around the Tanzu Kubernetes Grid (TKG).
 
-## createClusters.sh
+## createClusters
 
 As an enablement team, the VMware Cloud Services [Livefire](https://www.livefire.solutions) team needs to be able to deploy TKG Clusters to VMware Cloud on AWS quickly and consistently for up to 25 attendees.
 
@@ -12,7 +12,7 @@ Our attendees will each be given a Linux Ubuntu based Horizon Desktop with some 
 
 ![Horizon-TKG-Diagram](assets/Horizon-TKG-Diagram.png)
 
-The first script in this repository: createClusters.sh addresses the above need.
+The first script in this repository: [createClusters.sh](https://github.com/burkeazbill/TKG-Scripts/blob/master/createClusters.sh) addresses the above need.
 
 I've tried to make the script as reusable as possible.
 
@@ -27,7 +27,7 @@ I've tried to make the script as reusable as possible.
 ```bash
 # ./createClusters.sh ## ( ## should be a number from 1-99)
 # For example:
-createCluster.sh 25
+createClusters.sh 25
 ```
 
 Without modification, the above command should result in:
@@ -66,6 +66,11 @@ rm metal-lb-02.yaml
 rm tkg-02.kubeconfig
 ```
 
+## ToDo
+
+- Update script to have # of Controllers as config setting
+- Update script to have # of Workers as config setting
+
 ## My next challenge
 
 I've seen plenty of blog posts and info on how to get Traefik to route to Docker containers on the same Docker host, and how to route to things within a Kubernetes cluster that Traefik is installed inside of ... however, I have been unable to figure out the best approach to the following:
@@ -76,6 +81,11 @@ In this scenario, we have a training environment that has up to 25 Kubernetes cl
 
 For example, if a user opens their browser to http:/cluster-03.k8s.example.com, I want Traefik to route that request to the Kubernetes masters in cluster-03.internal.lab and send the traffic to the nodeport the attendees will configure as part of their exercises. This would allow each user to view their running service from outside our lab environment.
 
+I should also note that the Kubernetes Clusters are torn down after each training delivery has completed so they only exist for a max of 7 days. When another training is scheduled, I run a script to deploy a fresh cluster for each registered attendee and a few spares for the instructors.
+
 Does anyone here have any experience with this type of configuration? I don't want any changes to the infra as shown in the diagram as its purpose is to provide some hands-on with VMware's TKG created clusters.
+
+Thanks!
+would also want to have the dashboard available from within the lab environment, but not public so that port would not be configured on the firewall in front of Traefik.
 
 Thanks!
