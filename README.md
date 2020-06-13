@@ -71,21 +71,8 @@ rm tkg-02.kubeconfig
 - Update script to have # of Controllers as config setting
 - Update script to have # of Workers as config setting
 
-## My next challenge
+## Accessing App running on multiple K8s Clusters behind Traefik
 
-I've seen plenty of blog posts and info on how to get Traefik to route to Docker containers on the same Docker host, and how to route to things within a Kubernetes cluster that Traefik is installed inside of ... however, I have been unable to figure out the best approach to the following:
+Content coming soon, but here's a tease screenshot:
 
 ![tkg-kubeconfig-merged](/assets/traefik-to-multiple-k8s.png)
-
-In this scenario, we have a training environment that has up to 25 Kubernetes clusters deployed (1 cluster per attendee). These all get deployed via Tanzu Kubernetes Grid (TKG), which results in admin kubeconfigs also being generated. This is all done with the script here in my repo. What I would like to also do is route *.k8s.example.com (port 80 only!) to internal clusters that match the host portion of the requested FQDN to their cluster name on nodeport 32000.
-
-For example, if a user opens their browser to http:/cluster-03.k8s.example.com, I want Traefik to route that request to the Kubernetes masters in cluster-03.internal.lab and send the traffic to the nodeport the attendees will configure as part of their exercises. This would allow each user to view their running service from outside our lab environment.
-
-I should also note that the Kubernetes Clusters are torn down after each training delivery has completed so they only exist for a max of 7 days. When another training is scheduled, I run a script to deploy a fresh cluster for each registered attendee and a few spares for the instructors.
-
-Does anyone here have any experience with this type of configuration? I don't want any changes to the infra as shown in the diagram as its purpose is to provide some hands-on with VMware's TKG created clusters.
-
-Thanks!
-would also want to have the dashboard available from within the lab environment, but not public so that port would not be configured on the firewall in front of Traefik.
-
-Thanks!
