@@ -6,7 +6,7 @@
 # author      : Burke Azbill
 # repo        : https://github.com/burkeazbill/TKG-Scripts
 # date        : 2020-05-11
-# version     : 1.0    
+# version     : 1.1.0
 # usage       : createClusters.sh <clusterCount>
 # notes       :
 # This script has been written from the start to copy config
@@ -24,30 +24,39 @@ cluster_name_prefix="tkg-"
 # tkg_subnet : the network on which the Metal LB Load Balancer 
 #               range should be created. The last octet will be 
 #               filled dynamically
-tkg_subnet="172.24.6"
+tkg_subnet="172.25.1"
 # lb_address_count : How many addresses should be configured for 
 #               the Metal LB Config Map with the default setting 
 #               of 4, the first cluster will receive .1 -> .4, 
 #               second will receive .5 -> .8 and so on
 lb_address_count=4
 #### SCP SETTINGS ####
+# Path to private key used to SCP files to desktops:
+scp_private_key_path="~/.ssh/id_rsa"
+
 # scp_to_remote : Enable by setting to 1 and disable by setting to 0
 scp_to_remote=1
 # remote_prefix : Prefix for the remote systems. Suffix will match
 #               the suffix of the TKG Cluster (01 -> 99)
 remote_prefix="att-cs-l-"
 # remote_ssh_username : The name of the user to be used for the scp connection
-remote_ssh_username="vmware"
+remote_ssh_username="root"
 # remote_folder : The destination folder on the remote system for 
 #               the files to be copied to
-remote_folder="/home/$remote_ssh_username"
+remote_folder="/etc/skel"
+
+### SSH from Target Desktops to TKG Nodes Settings:
 # ssh_pub_key_path : path to alternative SSH public key to be copied
-#               to your tkg cluster nodes. Keep this next line commented
-#               to use the key that was used at initialization of tkg admin.
-#               If you uncomment the next line: fix path to your key AND
-#               uncomment the line below for VSPHERE_SSH_AUTHORIZED_KEY
-# ssh_pub_key_path="/home/vmware/tkg-cluster.pub"
-# TKG OVERRIDES:
+#     to your tkg cluster nodes. Keep this next line commented
+#     to use the key that was used at initialization of tkg admin.
+#     If you uncomment the next line: fix path to your key AND
+#     uncomment the line below for VSPHERE_SSH_AUTHORIZED_KEY
+#     The corresponding Private key to the public key specified here
+#     Should exist on the target systems. This allows them easy SSH to
+#     their assigned TKG Cluster VMs.     
+ssh_pub_key_path="~/.ssh/hol-keys/hol-pod.pub"
+
+# TKG CLI OVERRIDES:
 # - example usage of overrides:
 #   - Change SSH key or use different templates
 #   - Change destination Resource Pool or Folder (Could require script changes below)
@@ -57,21 +66,21 @@ remote_folder="/home/$remote_ssh_username"
 # The following Environment variables are set at the time of TKG 
 # Admin cluster initialization. If you wish to override, edit and 
 # Uncomment as desired:
-# VSPHERE_RESOURCE_POOL=/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/tkg
-# VSPHERE_TEMPLATE=/SDDC-Datacenter/vm/Workloads/tkg/photon-3-kube-v1.17.3+vmware.2
-# VSPHERE_SSH_AUTHORIZED_KEY=`cat $ssh_pub_key_path`
-# VSPHERE_DATASTORE=/SDDC-Datacenter/datastore/WorkloadDatastore
-# VSPHERE_DISK_GIB="40"
-# VSPHERE_MEM_MIB="4096"
-# CLUSTER_CIDR=100.96.0.0/11
-# VSPHERE_NETWORK=vra-attendee-net
-# VSPHERE_DATACENTER=/SDDC-Datacenter
-# VSPHERE_HAPROXY_TEMPLATE=/SDDC-Datacenter/vm/Workloads/tkg/capv-haproxy-v0.6.3
-# VSPHERE_PASSWORD='put-your-own-vcenter-pw-here'
-# VSPHERE_USERNAME='yourvcenteruser@vsphere.local'
-# VSPHERE_FOLDER=/SDDC-Datacenter/vm/Workloads/tkg
-# VSPHERE_NUM_CPUS="2"
-# VSPHERE_SERVER=place-vcenter-fqdn-here
+# VSPHERE_RESOURCE_POOL="/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/tkg/dev"
+# VSPHERE_TEMPLATE: /SDDC-Datacenter/vm/Workloads/tkg/photon-3-kube-v1.17.3+vmware.2
+export VSPHERE_SSH_AUTHORIZED_KEY=`cat $ssh_pub_key_path`
+# VSPHERE_DATASTORE: /SDDC-Datacenter/datastore/WorkloadDatastore
+# VSPHERE_DISK_GIB: "40"
+# VSPHERE_MEM_MIB: "4096"
+# CLUSTER_CIDR: 100.96.0.0/11
+# VSPHERE_NETWORK: vra-attendee-net
+# VSPHERE_DATACENTER: /SDDC-Datacenter
+# VSPHERE_HAPROXY_TEMPLATE: /SDDC-Datacenter/vm/Workloads/tkg/capv-haproxy-v0.6.3
+# VSPHERE_PASSWORD: 'put-your-own-vcenter-pw-here'
+# VSPHERE_USERNAME: 'yourvcenteruser@vsphere.local'
+# VSPHERE_FOLDER: /SDDC-Datacenter/vm/Workloads/tkg
+# VSPHERE_NUM_CPUS: "2"
+# VSPHERE_SERVER: place-vcenter-fqdn-here
 
 ###### You should not need to modify below this line ######
 (( lb_diff = lb_address_count -1 ))
@@ -92,7 +101,7 @@ start_time="$(date -u +%s)"
 # Initialize Cleanup Script
 cleanup_script="deleteClusters-"$start_time".sh"
 echo \# Cleanup Script > $cleanup_script
-
+chmod +x $cleanup_script
 if [ -n "$1" ]; then
   for i in $(seq 1 "$1"); do
     c_start="$(date -u +%s)"
@@ -122,9 +131,11 @@ data:
       - $lb_range
 EOF
     ################################################
-    echo "Running: tkg create cluster $clustername -c 1 -w 5 -p prod"
+    echo "Running: tkg create cluster $clustername -c 1 -w 2 -p dev"
+    echo "kubeconfig and metal-lb yaml will be placed in /etc/skel"
+    echo "which means it will be in each user home directory upon first login"
     echo "With LB Range: $lb_range"
-    tkg create cluster $clustername -c 1 -w 5 -p prod
+    tkg create cluster $clustername -c 1 -w 2 -p dev
     echo tkg delete cluster $clustername -y >> $cleanup_script
     echo kubectl config unset clusters.$clustername >> $cleanup_script
     echo kubectl config unset contexts.$clustername-admin@$clustername >> $cleanup_script
@@ -138,11 +149,11 @@ EOF
       # Now SCP the config file to the attendee desktop:
       echo Copying /$clustername.kubeconfig to $remote_system
       echo Copying /metal-lb-$cluster_number.yaml to $remote_system
-      scp -o StrictHostKeyChecking=no ./$clustername.kubeconfig $remote_ssh_username@$remote_system:$remote_folder
-      scp -o StrictHostKeyChecking=no ./metal-lb-$cluster_number.yaml $remote_ssh_username@$remote_system:$remote_folder
+      scp -i $scp_private_key_path -o StrictHostKeyChecking=no ./$clustername.kubeconfig $remote_ssh_username@$remote_system:$remote_folder
+      scp -i $scp_private_key_path -o StrictHostKeyChecking=no ./metal-lb-$cluster_number.yaml $remote_ssh_username@$remote_system:$remote_folder
     fi
     c_end="$(date -u +%s)"
-    c_elapsed="$(($end_time-$start_time))"
+    c_elapsed="$(($c_end-$c_start))"
     secs_to_human $c_elapsed
   done
 else

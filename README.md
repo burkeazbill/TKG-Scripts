@@ -50,7 +50,7 @@ Without modification, the above command should result in:
   - Deletes the .kubeconfig and .yaml
   - Removes the Cluster, Context, and User from the local .kube/config file (these were merged into the local config as the credentials were exported during the script)
 
-```bash
+```shell
 # Cleanup Script
 tkg delete cluster tkg-01 -y
 kubectl config unset clusters.tkg-01
