@@ -6,7 +6,7 @@
 # author      : Burke Azbill
 # repo        : https://github.com/burkeazbill/TKG-Scripts
 # date        : 2020-05-11
-# version     : 1.1.0
+# version     : 1.1.3
 # usage       : createClusters.sh <clusterCount>
 # notes       :
 # This script has been written from the start to copy config
@@ -32,7 +32,7 @@ tkg_subnet="172.25.1"
 lb_address_count=4
 #### SCP SETTINGS ####
 # Path to private key used to SCP files to desktops:
-scp_private_key_path="~/.ssh/id_rsa"
+scp_private_key_path="$HOME/.ssh/id_rsa"
 
 # scp_to_remote : Enable by setting to 1 and disable by setting to 0
 scp_to_remote=1
@@ -54,7 +54,9 @@ remote_folder="/etc/skel"
 #     The corresponding Private key to the public key specified here
 #     Should exist on the target systems. This allows them easy SSH to
 #     their assigned TKG Cluster VMs.     
-ssh_pub_key_path="~/.ssh/hol-keys/hol-pod.pub"
+ssh_pub_key_path="$HOME/.ssh/hol-keys/id_rsa.pub"
+# K8s version based on Photon image that is uploaded:
+k8sversion="v1.17.9+vmware.1"
 
 # TKG CLI OVERRIDES:
 # - example usage of overrides:
@@ -66,21 +68,33 @@ ssh_pub_key_path="~/.ssh/hol-keys/hol-pod.pub"
 # The following Environment variables are set at the time of TKG 
 # Admin cluster initialization. If you wish to override, edit and 
 # Uncomment as desired:
-# VSPHERE_RESOURCE_POOL="/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/tkg/dev"
-# VSPHERE_TEMPLATE: /SDDC-Datacenter/vm/Workloads/tkg/photon-3-kube-v1.17.3+vmware.2
+export VSPHERE_RESOURCE_POOL="/SDDC-Datacenter/host/Cluster-1/Resources/Compute-ResourcePool/tkg/dev"
+export VSPHERE_TEMPLATE="/SDDC-Datacenter/vm/Workloads/tkg/photon-3-kube-$k8sversion"
+export VSPHERE_FOLDER="/SDDC-Datacenter/vm/Workloads/tkg/dev"
 export VSPHERE_SSH_AUTHORIZED_KEY=`cat $ssh_pub_key_path`
-# VSPHERE_DATASTORE: /SDDC-Datacenter/datastore/WorkloadDatastore
-# VSPHERE_DISK_GIB: "40"
-# VSPHERE_MEM_MIB: "4096"
-# CLUSTER_CIDR: 100.96.0.0/11
-# VSPHERE_NETWORK: vra-attendee-net
-# VSPHERE_DATACENTER: /SDDC-Datacenter
-# VSPHERE_HAPROXY_TEMPLATE: /SDDC-Datacenter/vm/Workloads/tkg/capv-haproxy-v0.6.3
-# VSPHERE_PASSWORD: 'put-your-own-vcenter-pw-here'
-# VSPHERE_USERNAME: 'yourvcenteruser@vsphere.local'
-# VSPHERE_FOLDER: /SDDC-Datacenter/vm/Workloads/tkg
-# VSPHERE_NUM_CPUS: "2"
-# VSPHERE_SERVER: place-vcenter-fqdn-here
+
+# export VSPHERE_DATASTORE="/SDDC-Datacenter/datastore/WorkloadDatastore"
+# export VSPHERE_DISK_GIB="40"
+# export VSPHERE_MEM_MIB="4096"
+# export CLUSTER_CIDR=100.96.0.0/11
+# export VSPHERE_NETWORK=vra-attendee-net
+# export VSPHERE_DATACENTER="/SDDC-Datacenter"
+# export VSPHERE_HAPROXY_TEMPLATE="/SDDC-Datacenter/vm/Workloads/tkg/photon-3-haproxy-v1.2.4+vmware.1"
+# export VSPHERE_PASSWORD='put-your-own-vcenter-pw-here'
+# export VSPHERE_USERNAME='yourvcenteruser@vsphere.local'
+# export VSPHERE_NUM_CPUS="2"
+# export VSPHERE_SERVER=place-vcenter-fqdn-here
+
+# Worker Node Overrides:
+# VSPHERE_WORKER_DISK_GIB
+# VSPHERE_WORKER_MEM_MIB
+# VSPHERE_WORKER_NUM_CPUS
+
+# Control Plane Overrides:
+# VSPHERE_CONTROL_PLANE_DISK_GIB
+# VSPHERE_CONTROL_PLANE_MEM_MIB
+# VSPHERE_CONTROL_PLANE_NUM_CPUS 
+
 
 ###### You should not need to modify below this line ######
 (( lb_diff = lb_address_count -1 ))
@@ -135,7 +149,8 @@ EOF
     echo "kubeconfig and metal-lb yaml will be placed in /etc/skel"
     echo "which means it will be in each user home directory upon first login"
     echo "With LB Range: $lb_range"
-    tkg create cluster $clustername -c 1 -w 2 -p dev
+    # The following line updated to control size of nodes and allow for K8s version selection
+    tkg create cluster $clustername -c 1 -w 2 -p dev --controlplane-size medium  --haproxy-size small --kubernetes-version $k8sversion
     echo tkg delete cluster $clustername -y >> $cleanup_script
     echo kubectl config unset clusters.$clustername >> $cleanup_script
     echo kubectl config unset contexts.$clustername-admin@$clustername >> $cleanup_script
@@ -154,13 +169,15 @@ EOF
     fi
     c_end="$(date -u +%s)"
     c_elapsed="$(($c_end-$c_start))"
+    echo "== Cluster Create Time =="
     secs_to_human $c_elapsed
+    echo ""
   done
+  end_time="$(date -u +%s)"
+  elapsed="$(($end_time-$start_time))"
+  echo "=================== Total Script Run Time ========================="
+  secs_to_human $elapsed
 else
   echo "Usage: createClusters.sh <NumOfClusters>"
   echo "IE: createClusters.sh 5"
 fi
-end_time="$(date -u +%s)"
-elapsed="$(($end_time-$start_time))"
-echo "============================================"
-secs_to_human $elapsed
