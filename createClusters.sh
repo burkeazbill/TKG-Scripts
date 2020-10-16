@@ -28,9 +28,9 @@ lb_ips=($(echo 172.25.{1..3}.{0..255} | tr ' ' '\012'))
 # and iterates through to 172.25.2.255
 
 # lb_address_count : How many addresses should be configured for 
-#               the Metal LB Config Map with the default setting 
-#               of 4, the first cluster will receive .1 -> .4, 
-#               second will receive .5 -> .8 and so on
+#  the Metal LB Config Map with the default setting of 2,
+#  the first cluster will receive .1 for the Cluster VIP and .2 -> .3 for MetalLB config, 
+#  the second will receive .4 for the Cluster VIP and .5 -> .6 for the MetalLB config, and so on
 lb_address_count=2
 #### SCP SETTINGS ####
 # Path to private key used to SCP files to desktops:
@@ -97,7 +97,6 @@ export VSPHERE_SSH_AUTHORIZED_KEY=`cat $ssh_pub_key_path`
 # VSPHERE_CONTROL_PLANE_DISK_GIB
 # VSPHERE_CONTROL_PLANE_MEM_MIB
 # VSPHERE_CONTROL_PLANE_NUM_CPUS 
-
 
 ###### You should not need to modify below this line ######
 # hms function source:
