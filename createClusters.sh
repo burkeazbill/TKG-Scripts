@@ -5,7 +5,7 @@
 #               system.
 # author      : Burke Azbill
 # repo        : https://github.com/burkeazbill/TKG-Scripts
-# date        : 2020-10-15
+# date        : 2020-10-16
 # version     : 1.2
 # usage       : createClusters.sh <clusterCount>
 # notes       :
@@ -18,8 +18,8 @@
 #
 
 ################ Set Variables #############################
-# cluster_name_prefix : the suffix will be in the form of ##
-# where ## = 01 -> 999 
+# cluster_name_prefix : the suffix will be in the form of ###
+# where ## = 001 -> 999 
 cluster_name_prefix="tkg-"
 # Setup VIP and LB Address array:
 # This should be a range of available IPS that are not in a DHCP range
@@ -59,7 +59,7 @@ remote_folder="/etc/skel"
 ssh_pub_key_path="$HOME/.ssh/hol-keys/id_rsa.pub"
 # K8s version based on Photon image that is uploaded:
 k8sversion="v1.17.11+vmware.1"
-# Alternate versions for TKG 1.2: v1.18.8-vmware.1, v1.19.1-vmware.2
+# Alternate versions for TKG 1.2: v1.18.8+vmware.1, v1.19.1+vmware.2
 
 # TKG CLI OVERRIDES:
 # - example usage of overrides:
@@ -67,7 +67,7 @@ k8sversion="v1.17.11+vmware.1"
 #   - Change destination Resource Pool or Folder (Could require script changes below)
 #     if RP/Folder per cluster is desired
 #
-#  -- Please note that I have not tested all of the overrides!
+#  - Please note that I have not tested all of the overrides!
 # The following Environment variables are set at the time of TKG 
 # Admin cluster initialization. If you wish to override, edit and 
 # Uncomment as desired:
@@ -80,12 +80,10 @@ export VSPHERE_SSH_AUTHORIZED_KEY=`cat $ssh_pub_key_path`
 # export VSPHERE_DISK_GIB="40"
 # export VSPHERE_MEM_MIB="4096"
 # export CLUSTER_CIDR=100.96.0.0/11
-# export VSPHERE_NETWORK=vra-attendee-net
+# export VSPHERE_NETWORK=tkg-net
 # export VSPHERE_DATACENTER="/SDDC-Datacenter"
-# export VSPHERE_HAPROXY_TEMPLATE="/SDDC-Datacenter/vm/Workloads/tkg/photon-3-haproxy-v1.2.4+vmware.1"
 # export VSPHERE_PASSWORD='put-your-own-vcenter-pw-here'
 # export VSPHERE_USERNAME='yourvcenteruser@vsphere.local'
-# export VSPHERE_NUM_CPUS="2"
 # export VSPHERE_SERVER=place-vcenter-fqdn-here
 
 # Worker Node Overrides:
