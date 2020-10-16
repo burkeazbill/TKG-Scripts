@@ -19,7 +19,7 @@
 
 ################ Set Variables #############################
 # cluster_name_prefix : the suffix will be in the form of ##
-# where ## = 01 -> 99 
+# where ## = 01 -> 999 
 cluster_name_prefix="tkg-"
 # Setup VIP and LB Address array:
 # This should be a range of available IPS that are not in a DHCP range
